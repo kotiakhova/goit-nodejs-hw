@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { promises: fsPromises } = fs;
 
 const contactsPath = path.join(__dirname, "db/contacts.json");
 
@@ -33,9 +34,11 @@ function removeContact(contactId) {
   });
 }
 
-function addContact(name, email, phone) {
-  fs.readFile(contactsPath, "utf-8", (err, data) => {
-    const contacts = JSON.parse(data);
+async function addContact(name, email, phone) {
+  try {
+    const contacts = JSON.parse(
+      await fsPromises.readFile(contactsPath, "utf-8")
+    );
 
     const newContact = {
       id: contacts[contacts.length - 1].id + 1,
@@ -43,16 +46,32 @@ function addContact(name, email, phone) {
       email,
       phone,
     };
-    setTimeout(() => {
-      contacts.push(newContact);
-      fs.writeFile(contactsPath, JSON.stringify(contacts), (err) => {
-        if (err) console.log(err);
-      });
-      console.table(contacts);
-    }, 1500);
-  });
-}
 
+    contacts.push(newContact);
+    await fsPromises.writeFile(contactsPath, JSON.stringify(contacts), "utf-8");
+    console.table(contacts);
+  } catch (err) {
+    throw err;
+  }
+}
+// async function addContact(name, email, phone) {
+//   try {
+//     const contactsList = JSON.parse(
+//       await fsPromises.readFile("./db/contacts.json", "utf-8")
+//     );
+//     const newContact = {
+//       id: contactsList.length + 1,
+//       name,
+//       email,
+//       phone,
+//     };
+//     const newList = [...contactsList, newContact];
+//     await fsPromises.writeFile(contactsPath, JSON.stringify(newList), "utf-8");
+//     console.table(newList);
+//   } catch (err) {
+//     throw err;
+//   }
+// }
 // listContacts();
 
 // getContactById(2);
