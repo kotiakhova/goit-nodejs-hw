@@ -8,8 +8,6 @@ const argv = yargs
   .string("email")
   .string("phone").argv;
 
-// TODO: рефакторить
-
 function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
