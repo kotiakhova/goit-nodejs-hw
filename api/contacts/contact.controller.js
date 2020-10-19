@@ -5,7 +5,7 @@ const { promises: fsPromises } = fs;
 
 const contactsPath = path.join(__dirname, "/../../db/contacts.json");
 
-class UserController {
+class ContactController {
   get listContacts() {
     return this._listContacts.bind(this);
   }
@@ -108,13 +108,13 @@ class UserController {
   }
 
   validateCreateContact(req, res, next) {
-    const createUserRules = Joi.object({
+    const createRules = Joi.object({
       name: Joi.string().required(),
       email: Joi.string().required(),
       phone: Joi.string().required(),
     });
 
-    const result = createUserRules.validate(req.body);
+    const result = createRules.validate(req.body);
 
     if (result.error) {
       return res.status(400).json({ message: "missing required name field" });
@@ -122,13 +122,13 @@ class UserController {
     next();
   }
   validateUpdateContact(req, res, next) {
-    const createUserRules = Joi.object({
+    const createContactRules = Joi.object({
       name: Joi.string(),
       email: Joi.string(),
       phone: Joi.string(),
     });
 
-    const result = createUserRules.validate(req.body);
+    const result = createContactRules.validate(req.body);
 
     if (result.error) {
       return res.status(400).json({ message: "missing fields" });
@@ -143,4 +143,4 @@ class UserController {
     return targetContactIndex;
   }
 }
-module.exports = new UserController();
+module.exports = new ContactController();

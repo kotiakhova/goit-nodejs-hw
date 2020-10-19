@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const userRouter = require("./users/user.router");
+const contactRouter = require("./contacts/contact.router");
 require("dotenv").config();
 
 module.exports = class ContactsServer {
@@ -23,7 +23,7 @@ module.exports = class ContactsServer {
     this.server.use(morgan("tiny"));
   }
   initRoutes() {
-    this.server.use("/api/contacts", userRouter);
+    this.server.use("/api/contacts", contactRouter);
   }
   startListening() {
     this.server.listen(process.env.PORT, () => {
