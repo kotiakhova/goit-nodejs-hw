@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Joi = require("joi");
 const { promises: fsPromises } = fs;
+const contactModel = require("./contact.model");
 
 const contactsPath = path.join(__dirname, "/../../db/contacts.json");
 
@@ -23,9 +24,7 @@ class ContactController {
   }
   async _listContacts(req, res, next) {
     try {
-      return res.json(
-        JSON.parse(await fsPromises.readFile(contactsPath, "utf-8"))
-      );
+      return res.json(JSON.parse(await contactModel.find()));
     } catch (err) {
       next(err);
     }
@@ -44,20 +43,21 @@ class ContactController {
   }
   async _addContact(req, res, next) {
     try {
-      const contacts = JSON.parse(
-        await fsPromises.readFile(contactsPath, "utf-8")
-      );
-      const newContact = {
-        id: contacts[contacts.length - 1].id + 1,
-        ...req.body,
-      };
-      contacts.push(newContact);
-      await fsPromises.writeFile(
-        contactsPath,
-        JSON.stringify(contacts),
-        "utf-8"
-      );
-      res.status(200).json(newContact);
+      const contact = await contactModel.create(req.body);
+      // const contacts = JSON.parse(
+      //   await fsPromises.readFile(contactsPath, "utf-8")
+      // );
+      // const newContact = {
+      //   id: contacts[contacts.length - 1].id + 1,
+      //   ...req.body,
+      // };
+      // contacts.push(newContact);
+      // await fsPromises.writeFile(
+      //   contactsPath,
+      //   JSON.stringify(contacts),
+      //   "utf-8"
+      // );
+      res.status(201).json(contact);
     } catch (err) {
       next(err);
     }
@@ -112,6 +112,8 @@ class ContactController {
       name: Joi.string().required(),
       email: Joi.string().required(),
       phone: Joi.string().required(),
+      subscription: Joi.string(),
+      password: Joi.string().required(),
     });
 
     const result = createRules.validate(req.body);

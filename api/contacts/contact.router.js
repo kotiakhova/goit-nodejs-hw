@@ -16,4 +16,5 @@ contactRouter.patch(
   ContactController.updateContact
 );
 contactRouter.delete("/:contactId", ContactController.removeContact);
+
 module.exports = contactRouter;
