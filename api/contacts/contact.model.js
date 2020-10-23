@@ -7,7 +7,7 @@ const contactSchema = new Schema({
     required: true,
   },
   email: {
-    type: Number,
+    type: String,
     required: true,
     unique: true,
   },
@@ -30,7 +30,17 @@ const contactSchema = new Schema({
     default: "",
   },
 });
+contactSchema.statics.findContactByIdAndUpdate = findContactByIdAndUpdate;
 
+async function findContactByIdAndUpdate(contactId, updateParams) {
+  return this.findByIdAndUpdate(
+    contactId,
+    {
+      $set: updateParams,
+    },
+    { new: true }
+  );
+}
 const contactModel = mongoose.model("Contact", contactSchema);
 
-module.export = contactModel;
+module.exports = contactModel;

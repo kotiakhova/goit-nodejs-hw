@@ -1,10 +1,15 @@
-const fs = require("fs");
-const path = require("path");
 const Joi = require("joi");
-const { promises: fsPromises } = fs;
 const contactModel = require("./contact.model");
+const {
+  Types: { ObjectId },
+} = require("mongoose");
 
-const contactsPath = path.join(__dirname, "/../../db/contacts.json");
+// await mongoose.connect(process.env.MONGODB_URL, {
+//   useNewUrlParser: true,
+//   useFindAndModify: false,
+//   useCreateIndex: true,
+//   useUnifiedTopology: true,
+// });
 
 class ContactController {
   get listContacts() {
@@ -22,21 +27,23 @@ class ContactController {
   get getById() {
     return this._getById.bind(this);
   }
+
   async _listContacts(req, res, next) {
     try {
-      return res.json(JSON.parse(await contactModel.find()));
+      return res.json(await contactModel.find());
     } catch (err) {
       next(err);
     }
   }
   async _getById(req, res, next) {
     try {
-      const contacts = JSON.parse(
-        await fsPromises.readFile(contactsPath, "utf-8")
-      );
-      const id = Number(req.params.contactId);
-      const targetContactIndex = this.findContactIndexById(res, contacts, id);
-      res.status(200).json(contacts[targetContactIndex]);
+      const contactId = req.params.contactId;
+
+      const contact = await contactModel.findById(contactId);
+      if (!contact) {
+        return res.status(404).send();
+      }
+      res.status(200).json(contact);
     } catch (err) {
       next(err);
     }
@@ -44,19 +51,6 @@ class ContactController {
   async _addContact(req, res, next) {
     try {
       const contact = await contactModel.create(req.body);
-      // const contacts = JSON.parse(
-      //   await fsPromises.readFile(contactsPath, "utf-8")
-      // );
-      // const newContact = {
-      //   id: contacts[contacts.length - 1].id + 1,
-      //   ...req.body,
-      // };
-      // contacts.push(newContact);
-      // await fsPromises.writeFile(
-      //   contactsPath,
-      //   JSON.stringify(contacts),
-      //   "utf-8"
-      // );
       res.status(201).json(contact);
     } catch (err) {
       next(err);
@@ -64,47 +58,38 @@ class ContactController {
   }
   async _updateContact(req, res, next) {
     try {
-      const contacts = JSON.parse(
-        await fsPromises.readFile(contactsPath, "utf-8")
+      const contactId = req.params.contactId;
+      const contactToUpDate = await contactModel.findContactByIdAndUpdate(
+        contactId,
+        req.body
       );
-      const id = Number(req.params.contactId);
-
-      const targetContactIndex = this.findContactIndexById(res, contacts, id);
-
-      contacts[targetContactIndex] = {
-        ...contacts[targetContactIndex],
-        ...req.body,
-      };
-
-      await fsPromises.writeFile(
-        contactsPath,
-        JSON.stringify(contacts),
-        "utf-8"
-      );
-      return res.status(200).json(contacts[targetContactIndex]);
+      if (!contactToUpDate) {
+        return res.status(404).send();
+      }
+      return res.status(204).json(contactToUpDate);
     } catch (err) {
       next(err);
     }
   }
   async _removeContact(req, res, next) {
     try {
-      const contacts = JSON.parse(
-        await fsPromises.readFile(contactsPath, "utf-8")
-      );
-      const id = Number(req.params.contactId);
+      const contactId = req.params.contactId;
 
-      const targetContactIndex = this.findContactIndexById(res, contacts, id);
-
-      contacts.splice(targetContactIndex, 1);
-      await fsPromises.writeFile(
-        contactsPath,
-        JSON.stringify(contacts),
-        "utf-8"
-      );
-      res.status(200).json(contacts);
+      const removedContact = await contactModel.findOneAndDelete(contactId);
+      if (!removedContact) {
+        return res.status(404).send();
+      }
+      res.status(204).send();
     } catch (err) {
       next(err);
     }
+  }
+  validateId(req, res, next) {
+    const { contactId } = req.params;
+    if (!ObjectId.isValid(contactId)) {
+      return res.status(400).send();
+    }
+    next();
   }
 
   validateCreateContact(req, res, next) {
@@ -136,13 +121,6 @@ class ContactController {
       return res.status(400).json({ message: "missing fields" });
     }
     next();
-  }
-  findContactIndexById(res, contacts, id) {
-    const targetContactIndex = contacts.findIndex(contact => contact.id === id);
-    if (targetContactIndex === -1) {
-      return res.status(404).json({ message: "Not found" });
-    }
-    return targetContactIndex;
   }
 }
 module.exports = new ContactController();
