@@ -28,7 +28,12 @@ module.exports = class ContactsServer {
     this.server.use("/api/contacts", contactRouter);
   }
   async initDatabase() {
-    await mongoose.connect(process.env.MONGODB_URL);
+    await mongoose.connect(process.env.MONGODB_URL, {
+      useNewUrlParser: true,
+      useFindAndModify: false,
+      useCreateIndex: true,
+      useUnifiedTopology: true,
+    });
   }
   startListening() {
     const PORT = process.env.PORT;
