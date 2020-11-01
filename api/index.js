@@ -28,12 +28,18 @@ module.exports = class ContactsServer {
     this.server.use("/api/contacts", contactRouter);
   }
   async initDatabase() {
-    await mongoose.connect(process.env.MONGODB_URL, {
-      useNewUrlParser: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
-      useUnifiedTopology: true,
-    });
+    try {
+      await mongoose.connect(process.env.MONGODB_URL, {
+        useNewUrlParser: true,
+        useFindAndModify: false,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+      });
+    } catch (err) {
+      console.log(`Database connection failed`);
+      process.exit(1);
+    }
+    console.log("Database connection successful");
   }
   startListening() {
     const PORT = process.env.PORT;

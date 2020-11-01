@@ -4,13 +4,6 @@ const {
   Types: { ObjectId },
 } = require("mongoose");
 
-// await mongoose.connect(process.env.MONGODB_URL, {
-//   useNewUrlParser: true,
-//   useFindAndModify: false,
-//   useCreateIndex: true,
-//   useUnifiedTopology: true,
-// });
-
 class ContactController {
   get listContacts() {
     return this._listContacts.bind(this);
@@ -43,7 +36,7 @@ class ContactController {
       if (!contact) {
         return res.status(404).send();
       }
-      res.status(200).json(contact);
+      res.json(contact);
     } catch (err) {
       next(err);
     }
