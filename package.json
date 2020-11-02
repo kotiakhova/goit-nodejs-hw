@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node api/start.js",
+    "start": "nodemon api/start.js",
     "dev": "nodemon index.js"
   },
   "repository": {
@@ -19,13 +19,15 @@
   },
   "homepage": "https://github.com/kotiakhova/goit-nodejs-hw#readme",
   "devDependencies": {
-    "nodemon": "^2.0.5"
+    "nodemon": "^2.0.6"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "joi": "^17.2.1",
+    "mongodb": "^3.6.2",
+    "mongoose": "^5.10.9",
     "morgan": "^1.10.0",
     "yargs": "^16.0.3"
   }
