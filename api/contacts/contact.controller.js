@@ -23,7 +23,18 @@ class ContactController {
 
   async _listContacts(req, res, next) {
     try {
-      return res.json(await contactModel.find());
+      const { page, sub, limit } = req.query;
+      const options = {
+        page: page ? page : 1,
+        limit: limit ? limit : 5,
+      };
+      return res.json(
+        await contactModel.paginate(
+          sub ? { subscription: sub } : {},
+          options,
+          (err, result) => result.docs
+        )
+      );
     } catch (err) {
       next(err);
     }
@@ -77,6 +88,7 @@ class ContactController {
       next(err);
     }
   }
+
   validateId(req, res, next) {
     const { contactId } = req.params;
     if (!ObjectId.isValid(contactId)) {
