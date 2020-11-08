@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
+const mongoosePaginate = require("mongoose-paginate-v2");
 
 const contactSchema = new Schema({
   name: {
@@ -31,6 +32,7 @@ const contactSchema = new Schema({
   },
 });
 contactSchema.statics.findContactByIdAndUpdate = findContactByIdAndUpdate;
+contactSchema.plugin(mongoosePaginate);
 
 async function findContactByIdAndUpdate(contactId, updateParams) {
   return this.findByIdAndUpdate(

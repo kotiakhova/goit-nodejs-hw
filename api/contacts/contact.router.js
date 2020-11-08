@@ -9,6 +9,7 @@ contactRouter.get(
   ContactController.validateId,
   ContactController.getById
 );
+
 contactRouter.post(
   "/",
   ContactController.validateCreateContact,
@@ -25,5 +26,4 @@ contactRouter.delete(
   ContactController.validateId,
   ContactController.removeContact
 );
-
 module.exports = contactRouter;
